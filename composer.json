@@ -1,0 +1,20 @@
+{
+  "name": "twelver313/kapital-bank",
+  "description": "Kapital Bank 3DS v2.2 Payment Gateway adapter",
+  "type": "library",
+  "autoload": {
+    "psr-4": {
+      "Twelver313\\KapitalBank\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "mansurhamidov14"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "ext-curl": "*",
+    "ext-json": "*"
+  }
+}
