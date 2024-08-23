@@ -34,7 +34,7 @@ class Order
     ]));
   }
 
-  public function navigateToPaymentUr()
+  public function navigateToPaymentPage()
   {
     header('Location: ' . $this->url, true, 302);
     exit;
