@@ -114,7 +114,7 @@ if ($status === OrderStatus::CANCELED) {
 if ($status === OrderStatus::DECLINED) {
   ...
 }
-if ($status === OrderStatus::PAID) {
+if ($status === OrderStatus::FULLY_PAID) {
   ...
 }
 if ($status === OrderStatus::EXPIRED) {
@@ -122,5 +122,20 @@ if ($status === OrderStatus::EXPIRED) {
 }
 if ($status === OrderStatus::REFUNDED) {
   ...
+}
+```
+
+### 2.5 Restore order
+```php
+$orderParams = [
+  'id' => <ORDER_ID>,
+  'password' => '<ORDER_PASSWORD>' 
+];
+$paymentResult = $paymentGateway->getOrderStatus($orderParams);
+
+/** Restoring order if it was not finished or expired */
+if ($paymentResult->isPreparing()) {
+  $order = $paymentGateway->restoreOrder($orderParams);
+  $order->navigateToPaymentPage();
 }
 ```

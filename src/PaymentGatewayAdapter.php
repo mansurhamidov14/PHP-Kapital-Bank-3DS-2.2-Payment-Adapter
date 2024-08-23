@@ -127,6 +127,15 @@ class PaymentGatewayAdapter
     return new OrderStatus($response);
   }
 
+  public function restoreOrder($options) {
+    return new Order([
+      'id' => $options['id'],
+      'password' => $options['password'],
+      'secret' => $options['secret'],
+      'hppUrl' => $this->paymentHost . '/flex'
+    ]);
+  }
+
   /**
    * @throws Exception
    */

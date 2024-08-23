@@ -20,7 +20,7 @@ class OrderStatus
 
   const DECLINED = 'Declined';
   const PREPARING = 'Preparing';
-  const PAID = 'FullyPaid';
+  const FULLY_PAID = 'FullyPaid';
   const CANCELED = 'Cancelled';
   const EXPIRED = 'Expired';
   const REFUNDED = 'Refunded';
@@ -37,5 +37,35 @@ class OrderStatus
     foreach ($options as $key => $value) {
       $this->{$key} = is_array($value) ? (object)$value : $value;
     }
+  }
+
+  public function isPreparing()
+  {
+    return $this->type == self::PREPARING;
+  }
+
+  public function isFullyPaid()
+  {
+    return $this->type == self::FULLY_PAID;
+  }
+
+  public function isCanceled()
+  {
+    return $this->type == self::CANCELED;
+  }
+
+  public function isExpired()
+  {
+    return $this->type == self::EXPIRED;
+  }
+
+  public function isRefunded()
+  {
+    return $this->type == self::REFUNDED;
+  }
+
+  public function isDeclined()
+  {
+    return $this->type == self::DECLINED;
   }
 }
