@@ -13,7 +13,6 @@
 
 ## 1. Installation
 ### 1.1 Add the lines below to your `composer.json`:
-
 ```json
 {
   ...
@@ -48,7 +47,7 @@
 use Twelver313\KapitalBank\PaymentGatewayAdapter;
 
 $paymentGateway = new PaymentGatewayAdapter([
-  'login': '<YOUR_LOGIN>',
+  'login' => '<YOUR_LOGIN>',
   'password' => '<YOUR_PASSWORD>',
   'isDev' => true, // Optional flag for using Kapital-Bank's test environment
 ]);
@@ -101,26 +100,26 @@ $response->match->{$property}; // Read Kapital-Bank's official documentation see
 ```php
 use Twelver313\KapitalBank\OrderStatus
 
-$paymentResult = $paymentGateway->getOrderStatus([
+$orderStatus = $paymentGateway->getOrderStatus([
   'id' => <ORDER_ID>,
   'password' => '<ORDER_PASSWORD>' 
 ]);
-$status = $paymentResult->status;
+$status = $orderStatus->status;
 
 // Do any stuff depending on status
-if ($status === OrderStatus::CANCELED) {
+if ($status == OrderStatus::CANCELED) { // alternative $orderStatus->isCanceled()
   ...
 }
-if ($status === OrderStatus::DECLINED) {
+if ($status == OrderStatus::DECLINED) { // alternative $orderStatus->isDeclined()
   ...
 }
-if ($status === OrderStatus::FULLY_PAID) {
+if ($status == OrderStatus::FULLY_PAID) { // alternative $orderStatus->isFullyPaid()
   ...
 }
-if ($status === OrderStatus::EXPIRED) {
+if ($status == OrderStatus::EXPIRED) { // alternative $orderStatus->isExpired()
   ...
 }
-if ($status === OrderStatus::REFUNDED) {
+if ($status == OrderStatus::REFUNDED) { // alternative $orderStatus->isRefunded()
   ...
 }
 ```
@@ -131,10 +130,10 @@ $orderParams = [
   'id' => <ORDER_ID>,
   'password' => '<ORDER_PASSWORD>' 
 ];
-$paymentResult = $paymentGateway->getOrderStatus($orderParams);
+$orderStatus = $paymentGateway->getOrderStatus($orderParams);
 
 /** Restoring order if it was not finished or expired */
-if ($paymentResult->isPreparing()) {
+if ($orderStatus->isPreparing()) {
   $order = $paymentGateway->restoreOrder($orderParams);
   $order->navigateToPaymentPage();
 }
