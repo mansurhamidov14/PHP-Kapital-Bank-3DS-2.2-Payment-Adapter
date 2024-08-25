@@ -41,31 +41,42 @@ class OrderStatus
 
   public function isPreparing()
   {
-    return $this->type == self::PREPARING;
+    return $this->status == self::PREPARING;
   }
 
   public function isFullyPaid()
   {
-    return $this->type == self::FULLY_PAID;
+    return $this->status == self::FULLY_PAID;
   }
 
   public function isCanceled()
   {
-    return $this->type == self::CANCELED;
+    return $this->status == self::CANCELED;
   }
 
   public function isExpired()
   {
-    return $this->type == self::EXPIRED;
+    return $this->status == self::EXPIRED;
   }
 
   public function isRefunded()
   {
-    return $this->type == self::REFUNDED;
+    return $this->status == self::REFUNDED;
   }
 
   public function isDeclined()
   {
-    return $this->type == self::DECLINED;
+    return $this->status == self::DECLINED;
+  }
+
+  /**
+   * @throws Exception
+   */
+  public function isOneOf($statuses) {
+    if (!is_array($statuses)) {
+      throw new Exception('"$statuses" should be an array');
+    }
+
+    return in_array($this->status, $statuses);
   }
 }

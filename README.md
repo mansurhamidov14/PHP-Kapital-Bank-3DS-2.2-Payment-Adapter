@@ -50,6 +50,8 @@ $paymentGateway = new PaymentGateway([
   'login' => '<YOUR_LOGIN>',
   'password' => '<YOUR_PASSWORD>',
   'isDev' => true, // Optional flag for using Kapital-Bank's test environment
+  /* You don't need to pass the option below. It was added just in case Kapital Bank changes host address */
+  // 'paymentHost' => 'https://txpgtst.kapitalbank.az'
 ]);
 ```
 
@@ -120,6 +122,9 @@ if ($status == OrderStatus::EXPIRED) { // equivalent: $orderStatus->isExpired()
   ...
 }
 if ($status == OrderStatus::REFUNDED) { // equivalent: $orderStatus->isRefunded()
+  ...
+}
+if ($orderStatus->isOneOf([OrderStatus::CANCELED, OrderStatus::DECLINED])) {
   ...
 }
 ```
