@@ -107,19 +107,19 @@ $orderStatus = $paymentGateway->getOrderStatus([
 $status = $orderStatus->status;
 
 // Do any stuff depending on status
-if ($status == OrderStatus::CANCELED) { // alternative $orderStatus->isCanceled()
+if ($status == OrderStatus::CANCELED) { // equivalent: $orderStatus->isCanceled()
   ...
 }
-if ($status == OrderStatus::DECLINED) { // alternative $orderStatus->isDeclined()
+if ($status == OrderStatus::DECLINED) { // equivalent: $orderStatus->isDeclined()
   ...
 }
-if ($status == OrderStatus::FULLY_PAID) { // alternative $orderStatus->isFullyPaid()
+if ($status == OrderStatus::FULLY_PAID) { // equivalent: $orderStatus->isFullyPaid()
   ...
 }
-if ($status == OrderStatus::EXPIRED) { // alternative $orderStatus->isExpired()
+if ($status == OrderStatus::EXPIRED) { // equivalent: $orderStatus->isExpired()
   ...
 }
-if ($status == OrderStatus::REFUNDED) { // alternative $orderStatus->isRefunded()
+if ($status == OrderStatus::REFUNDED) { // equivalent: $orderStatus->isRefunded()
   ...
 }
 ```
