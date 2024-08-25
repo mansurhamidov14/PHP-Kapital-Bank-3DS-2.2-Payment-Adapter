@@ -4,7 +4,7 @@ namespace Twelver313\KapitalBank;
 
 use Exception;
 
-class PaymentGatewayAdapter
+class PaymentGateway
 {
   private static $PROD_HOST = 'https://e-commerce.kapitalbank.az';
   private static $DEV_HOST = 'https://txpgtst.kapitalbank.az';

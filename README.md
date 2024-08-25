@@ -44,9 +44,9 @@
 ## 2. Usage
 ### 2.1 Initialize payment gateway adapter
 ```php
-use Twelver313\KapitalBank\PaymentGatewayAdapter;
+use Twelver313\KapitalBank\PaymentGateway;
 
-$paymentGateway = new PaymentGatewayAdapter([
+$paymentGateway = new PaymentGateway([
   'login' => '<YOUR_LOGIN>',
   'password' => '<YOUR_PASSWORD>',
   'isDev' => true, // Optional flag for using Kapital-Bank's test environment
