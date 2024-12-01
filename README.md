@@ -12,34 +12,7 @@
     - [2.4 Get order status](#24-get-order-status)
 
 ## 1. Installation
-### 1.1 Add the lines below to your `composer.json`:
-```json
-{
-  ...
-  "require": {
-    ...
-    "twelver313/kapital-bank": "dev-master"
-  },
-  "config": {
-    ...
-    "github-oauth": {
-      "github.com": "<GITHUB_ACCESS_TOKE>"
-    }
-  },
-  "repositories": {
-    ...
-    {
-      "type": "vcs",
-      "name": "twelver313/kapital-bank",
-      "url": "https://github.com/mansurhamidov14/Kapital-Bank-3DS-2.2-Payment-Adapter-PHP-.git",
-      "branch": "master"
-    }
-  }
-}
-```
-
-### 1.2 Install the package
-```composer update twelver313/kapital-bank```
+```composer require twelver313/kapital-bank```
 
 ## 2. Usage
 ### 2.1 Initialize payment gateway adapter
