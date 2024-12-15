@@ -20,7 +20,7 @@ class RefundResponse
     }
 
     foreach ($options as $key => $value) {
-      $this->{$key} = is_array($value) ? (object)$value : $value;
+      $this->{$key} = $value;
     }
   }
 }

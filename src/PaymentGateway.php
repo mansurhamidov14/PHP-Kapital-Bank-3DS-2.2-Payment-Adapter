@@ -74,11 +74,21 @@ class PaymentGateway
       CURLOPT_POSTFIELDS => json_encode($body)
     ];
 
-    $order = self::executeRequest($requestOptions)['order'];
+    $order = self::executeRequest($requestOptions)->order;
     return new Order($order);
   }
 
   /**
+   * @param array $options
+   * ```php
+   * [
+   *   'amount' => 100, // Required option
+   *   'description' => 'Payment for a laptop', // Required option
+   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required option
+   *   'currency' => 'AZN', // Optional, default 'AZN'
+   *   'language' => 'az', // Optional, default 'az'
+   * ]
+   * ```
    * @throws Exception
    * @return Order
    */
@@ -88,6 +98,16 @@ class PaymentGateway
   }
 
   /**
+   * @param array $options
+   * ```php
+   * [
+   *   'amount' => 100, // Required
+   *   'description' => 'Payment for a laptop', // Required
+   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required
+   *   'currency' => 'AZN', // Optional, default 'AZN'
+   *   'language' => 'az', // Optional, default 'az'
+   * ]
+   * ```
    * @throws Exception
    * @return Order
    */
@@ -97,6 +117,16 @@ class PaymentGateway
   }
 
   /**
+   * @param array $options
+   * ```php
+   * [
+   *   'amount' => 100, // Required
+   *   'description' => 'Payment for a laptop', // Required
+   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required
+   *   'currency' => 'AZN', // Optional, default 'AZN'
+   *   'language' => 'az', // Optional, default 'az'
+   * ]
+   * ```
    * @throws Exception
    * @return Order
    */
@@ -107,9 +137,9 @@ class PaymentGateway
 
   /**
    * @return OrderStatus
-   *@throws  Exception
+   * @throws  Exception
    */
-  public function getOrderStatus($options)
+  private function getOrderStatusResponse($options, $is_detailed = false)
   {
     if (empty($options['id'])) {
       throw new Exception('Missing required parameter "id" for "getOrderStatus" method');
@@ -119,12 +149,53 @@ class PaymentGateway
       throw new Exception('Missing required parameter "password" for "getOrderStatus" method');
     }
 
+    $requestUrl = $this->paymentHost . '/api/order/' . $options['id'] . '?password=' . $options['password'];
+
+    if ($is_detailed) {
+      $requestUrl .= '&tranDetailLevel=2&tokenDetailLevel=2&orderDetailLevel=2';
+    }
+
     $requestOptions = [
-      CURLOPT_URL => $this->paymentHost . '/api/order/' . $options['id'] . '?password=' . $options['password'],
+      CURLOPT_URL => $requestUrl,
     ];
 
-    $response = $this->executeRequest($requestOptions)['order'];
-    return new OrderStatus($response);
+    return $this->executeRequest($requestOptions)->order;
+  }
+
+  /**
+   * @param array $options
+   * ```php
+   * [
+   *   'id' => 5555, // Order id
+   *   'password' => 'zxcvbnn123', // Order password
+   * ]
+   * ```
+   * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#3c15f522-6dae-4ee4-a9e2-f43257919b29
+   * @throws Exception
+   * @return OrderStatus
+   */
+  public function getOrderStatus($options)
+  {
+    $order = $this->getOrderStatusResponse($options);
+    return new OrderStatus($order);
+  }
+
+  /**
+   * @param array $options
+   * ```php
+   * [
+   *   'id' => 5555, // Order id
+   *   'password' => 'zxcvbnn123', // Order password
+   * ]
+   * ```
+   * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#790f2d23-4ac2-4000-94ec-2b0c45a49709
+   * @throws Exception
+   * @return OrderStatus
+   */
+  public function getDetailedOrderStatus($options)
+  {
+    $order = $this->getOrderStatusResponse($options, true);
+    return new DetailedOrderStatus($order);
   }
 
   public function restoreOrder($options) {
@@ -137,6 +208,16 @@ class PaymentGateway
   }
 
   /**
+   * @param array $options
+   * ```php
+   * [
+   *   'id' => 5555, // Order id
+   *   'password' => 'zxcxvb123', // Order password
+   *   'amount' => 1000, // Refund amount
+   *   'phase' => 'Single', // Optional, default 'Single'
+   * ]
+   * ```
+   * @return RefundResponse
    * @throws Exception
    */
   public function refund($options)
@@ -165,7 +246,7 @@ class PaymentGateway
       ])
     ];
 
-    $response = $this->executeRequest($requestOptions)['tran'];
+    $response = $this->executeRequest($requestOptions)->tran;
     return new RefundResponse($response);
   }
 
@@ -180,6 +261,6 @@ class PaymentGateway
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt_array($curl, $options);
     $execute = curl_exec($curl);
-    return json_decode($execute, true);
+    return json_decode($execute);
   }
 }
