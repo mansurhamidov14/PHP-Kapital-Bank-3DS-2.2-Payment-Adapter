@@ -1,6 +1,7 @@
 {
   "name": "twelver313/kapital-bank",
   "description": "Kapital Bank 3DS v2.2 Payment Gateway adapter",
+  "license": "BSD-3-Clause",
   "type": "library",
   "autoload": {
     "psr-4": {
@@ -9,7 +10,9 @@
   },
   "authors": [
     {
-      "name": "mansurhamidov14"
+      "name": "Mansur Hamidov",
+      "email": "mansur.hamidov.19@gmail.com",
+      "role": "Author"
     }
   ],
   "require": {
