@@ -74,7 +74,7 @@ class PaymentGateway
       CURLOPT_POSTFIELDS => json_encode($body)
     ];
 
-    $order = self::executeRequest($requestOptions)->order;
+    $order = (array)(self::executeRequest($requestOptions)->order);
     return new Order($order);
   }
 

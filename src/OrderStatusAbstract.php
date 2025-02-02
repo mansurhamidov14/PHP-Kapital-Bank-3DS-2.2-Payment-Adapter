@@ -80,7 +80,7 @@ class OrderStatusAbstract
    */
   public function __construct($options)
   {
-    if (empty($options) || !is_array($options)) {
+    if (empty($options) || !is_object($options)) {
       throw new Exception('Invalid options');
     }
 
