@@ -167,7 +167,7 @@ class PaymentGateway
    * ```php
    * [
    *   'id' => 5555, // Order id
-   *   'password' => 'zxcvbnn123', // Order password
+   *   'password' => 'yourpassword123', // Order password
    * ]
    * ```
    * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#3c15f522-6dae-4ee4-a9e2-f43257919b29
@@ -190,7 +190,7 @@ class PaymentGateway
    * ```
    * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#790f2d23-4ac2-4000-94ec-2b0c45a49709
    * @throws Exception
-   * @return OrderStatus
+   * @return DetailedOrderStatus
    */
   public function getDetailedOrderStatus($options)
   {
@@ -198,6 +198,11 @@ class PaymentGateway
     return new DetailedOrderStatus($order);
   }
 
+  /**
+   * @param $options
+   * @return Order
+   * @throws Exception
+   */
   public function restoreOrder($options) {
     return new Order([
       'id' => $options['id'],
