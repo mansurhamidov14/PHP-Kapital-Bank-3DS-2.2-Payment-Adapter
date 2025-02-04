@@ -4,6 +4,23 @@ namespace Twelver313\KapitalBank;
 
 use Exception;
 
+/**
+ * @method bool isAuthorized() Order has been authorized (Authorization transaction is executed).
+ * @method bool isPreparing() Order is being prepared, no transactions have been executed on it yet.
+ * @method bool isRejected() Order has been rejected by the PSP (before payment). (Order is rejected by the PSP)
+ * @method bool isCanceled() Order has been cancelled by the consumer (before payment). (Order is cancelled by the merchant)
+ * @method bool isRefused() Consumer has refused to pay for the order (before payment or after unsuccessful payment attempt). (Order is refused by the consumer)
+ * @method bool isExpired() Order has expired (before payment). (Timeout occurs when executing the order scenario)
+ * @method bool isPartiallyPaid() Order has been partially paid (Clearing transaction is executed for the part of the order amount).
+ * @method bool isFullyPaid() Order has been fully paid (Clearing transaction is executed for the full order amount (or several clearing transactions)).
+ * @method bool isFunded() Order has been funded (debit transaction has been executed). The status can be assigned only to the order of the DualStep Transfer Order class.
+ * @method bool isRefunded() Accounted payment amount and the accounted refund amount under the order are equal.
+ * @method bool isDeclined()
+ * a) AReq and RReq (3DS 2) could not be executed due to rejection by the issuer / error during authentication
+ * b) Operation was declined by PMO
+ * @method bool isClosed() Order has been closed (after payment).
+ * @method bool isVoided() Authorized payment amount under the order is zero.
+ */
 class OrderStatusAbstract
 {
   /** @var int id of order */
@@ -89,113 +106,21 @@ class OrderStatusAbstract
     }
   }
 
-  /** 
-   * Order is being prepared, no transactions have been executed on it yet.
-   */
-  public function isPreparing()
+  public function __call($name, $args)
   {
-    return $this->status == self::PREPARING;
-  }
+    if (substr($name, 0, 2) != 'is') {
+      throw new Exception('Calling to unknown method: ' . $name);
+    }
 
-  /** 
-   * Order has been rejected by the PSP (before payment). (Order is rejected by the PSP)
-   */
-  public function isRejected()
-  {
-    return $this->status == self::REJECTED;
-  }
-
-  /** 
-   * Consumer has refused to pay for the order (before payment or after unsuccessful payment attempt). (Order is refused by the consumer) 
-   */
-  public function isRefused()
-  {
-    return $this->status == self::REFUSED;
-  }
-
-  /** 
-   * Order has been authorized (Authorization transaction is executed).
-   */
-  public function isAuthorized()
-  {
-    return $this->status == self::AUTHORIZED;
-  }
-
-  /** 
-   * Order has been partially paid (Clearing transaction is executed for the part of the order amount).
-   */
-  public function isPartiallyPaid()
-  {
-    return $this->status == self::PARTIALLY_PAID;
-  }
-
-  /** 
-   * Order has been fully paid (Clearing transaction is executed for the full order amount (or several clearing transactions)).
-   */
-  public function isFullyPaid()
-  {
-    return $this->status == self::FULLY_PAID;
-  }
-
-  /** 
-   * Order has been funded (debit transaction has been executed). The status can be assigned only to the order of the DualStep Transfer Order class.
-   */
-  public function isFunded()
-  {
-    return $this->status == self::FUNDED;
-  }
-
-  /** 
-   * Order has been cancelled by the consumer (before payment). (Order is cancelled by the merchant)
-   */
-  public function isCanceled()
-  {
-    return $this->status == self::CANCELED;
-  }
-
-  /** 
-   * Order has expired (before payment). (Timeout occurs when executing the order scenario) 
-   */
-  public function isExpired()
-  {
-    return $this->status == self::EXPIRED;
-  }
-
-  /** 
-   * Accounted payment amount and the accounted refund amount under the order are equal.
-   */
-  public function isRefunded()
-  {
-    return $this->status == self::REFUNDED;
-  }
-
-  /** 
-   * * AReq and RReq (3DS 2) could not be executed due to rejection by the issuer / error during authentication.
-   * * Operation was declined by PMO 
-   */
-  public function isDeclined()
-  {
-    return $this->status == self::DECLINED;
-  }
-
-  /** 
-   * Order has been closed (after payment). 
-   */
-  public function isClosed()
-  {
-    return $this->status == self::CLOSED;
-  }
-
-  /** 
-   * Authorized payment amount under the order is zero.
-   */
-  public function isVoided()
-  {
-    return $this->status == self::VOIDED;
+    $checkStatus = substr($name, 2);
+    if ($checkStatus == 'Canceled') {
+      $checkStatus = self::CANCELED;
+    }
+    return $this->status === $checkStatus;
   }
 
   /**
-   * @param string $statuses
+   * @param array $statuses
    * @throws Exception
    */
   public function isOneOf($statuses) {
