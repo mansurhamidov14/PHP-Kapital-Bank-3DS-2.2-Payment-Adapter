@@ -9,6 +9,7 @@ use Exception;
  * @method bool isPreparing() Order is being prepared, no transactions have been executed on it yet.
  * @method bool isRejected() Order has been rejected by the PSP (before payment). (Order is rejected by the PSP)
  * @method bool isCanceled() Order has been cancelled by the consumer (before payment). (Order is cancelled by the merchant)
+ * @method bool isCancelled() Order has been cancelled by the consumer (before payment). (Order is cancelled by the merchant)
  * @method bool isRefused() Consumer has refused to pay for the order (before payment or after unsuccessful payment attempt). (Order is refused by the consumer)
  * @method bool isExpired() Order has expired (before payment). (Timeout occurs when executing the order scenario)
  * @method bool isPartiallyPaid() Order has been partially paid (Clearing transaction is executed for the part of the order amount).
@@ -93,12 +94,12 @@ class OrderStatusAbstract
   const PREPARING = 'Preparing';
 
   /**
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function __construct($options)
   {
     if (empty($options) || !is_object($options)) {
-      throw new Exception('Invalid options');
+      throw new PaymentGatewayException('Invalid options');
     }
 
     foreach ($options as $key => $value) {
@@ -121,11 +122,11 @@ class OrderStatusAbstract
 
   /**
    * @param array $statuses
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function isOneOf($statuses) {
     if (!is_array($statuses)) {
-      throw new Exception('"$statuses" should be an array');
+      throw new PaymentGatewayException('"$statuses" should be an array');
     }
 
     return in_array($this->status, $statuses);
