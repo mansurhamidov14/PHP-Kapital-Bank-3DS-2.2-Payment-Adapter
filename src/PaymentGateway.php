@@ -2,8 +2,6 @@
 
 namespace Twelver313\KapitalBank;
 
-use Exception;
-
 class PaymentGateway
 {
   private static $PROD_HOST = 'https://e-commerce.kapitalbank.az';
@@ -14,16 +12,16 @@ class PaymentGateway
   private $requestHeaders;
 
   /**
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function __construct($options)
   {
     if (empty($options['login'])) {
-      throw new Exception('Missing required parameter "login" for constructor');
+      throw new PaymentGatewayException('Missing required parameter "login" for constructor');
     }
 
     if (empty($options['password'])) {
-      throw new Exception('Missing required parameter "password" for constructor');
+      throw new PaymentGatewayException('Missing required parameter "password" for constructor');
     }
 
     $this->requestHeaders = [
@@ -41,17 +39,17 @@ class PaymentGateway
   }
 
   /**
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    * @return Order
    */
   public function createOrder($options, $type)
   {
     if (empty($options['amount'])) {
-      throw new Exception('Missing required parameter "amount" for "createPurchaseOrder" method');
+      throw new PaymentGatewayException('Missing required parameter "amount" for "createPurchaseOrder" method');
     }
 
     if (empty($options['description'])) {
-      throw new Exception('Missing required parameter "description" for "createPurchaseOrder" method');
+      throw new PaymentGatewayException('Missing required parameter "description" for "createPurchaseOrder" method');
     }
 
     $body = [
@@ -89,7 +87,7 @@ class PaymentGateway
    *   'language' => 'az', // Optional, default 'az'
    * ]
    * ```
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    * @return Order
    */
   public function createPurchaseOrder($options)
@@ -108,7 +106,7 @@ class PaymentGateway
    *   'language' => 'az', // Optional, default 'az'
    * ]
    * ```
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    * @return Order
    */
   public function createPreAuthOrder($options)
@@ -127,7 +125,7 @@ class PaymentGateway
    *   'language' => 'az', // Optional, default 'az'
    * ]
    * ```
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    * @return Order
    */
   public function createRecurringOrder($options)
@@ -137,16 +135,16 @@ class PaymentGateway
 
   /**
    * @return OrderStatus
-   * @throws  Exception
+   * @throws  Twelver313\KapitalBank\PaymentGatewayException
    */
   private function getOrderStatusResponse($options, $is_detailed = false)
   {
     if (empty($options['id'])) {
-      throw new Exception('Missing required parameter "id" for "getOrderStatus" method');
+      throw new PaymentGatewayException('Missing required parameter "id" for "getOrderStatus" method');
     }
 
     if (empty($options['password'])) {
-      throw new Exception('Missing required parameter "password" for "getOrderStatus" method');
+      throw new PaymentGatewayException('Missing required parameter "password" for "getOrderStatus" method');
     }
 
     $requestUrl = $this->paymentHost . '/api/order/' . $options['id'] . '?password=' . $options['password'];
@@ -171,7 +169,7 @@ class PaymentGateway
    * ]
    * ```
    * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#3c15f522-6dae-4ee4-a9e2-f43257919b29
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    * @return OrderStatus
    */
   public function getOrderStatus($options)
@@ -189,7 +187,7 @@ class PaymentGateway
    * ]
    * ```
    * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#790f2d23-4ac2-4000-94ec-2b0c45a49709
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    * @return DetailedOrderStatus
    */
   public function getDetailedOrderStatus($options)
@@ -201,7 +199,7 @@ class PaymentGateway
   /**
    * @param $options
    * @return Order
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function restoreOrder($options) {
     return new Order([
@@ -223,20 +221,20 @@ class PaymentGateway
    * ]
    * ```
    * @return RefundResponse
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function refund($options)
   {
     if (empty($options['id'])) {
-      throw new Exception('Missing required parameter "id" for "refund" method');
+      throw new PaymentGatewayException('Missing required parameter "id" for "refund" method');
     }
 
     if (empty($options['password'])) {
-      throw new Exception('Missing required parameter "password" for "refund" method');
+      throw new PaymentGatewayException('Missing required parameter "password" for "refund" method');
     }
 
     if (empty($options['amount'])) {
-      throw new Exception('Missing required parameter "amount" for "refund" method');
+      throw new PaymentGatewayException('Missing required parameter "amount" for "refund" method');
     }
 
     $requestOptions = [
@@ -265,7 +263,22 @@ class PaymentGateway
     curl_setopt($curl, CURLOPT_HTTPHEADER, $this->requestHeaders);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt_array($curl, $options);
-    $execute = curl_exec($curl);
-    return json_decode($execute);
+    $response = curl_exec($curl);
+    $errNo = curl_errno($curl);
+    if ($errNo) {
+      throw new PaymentGatewayException(curl_error($curl), $errNo);
+    }
+    $info = curl_getinfo($curl);
+    $response = json_decode($response);
+
+    if (PHP_VERSION_ID < 80000) {
+      curl_close($curl);
+    }
+
+    if ($info['http_code'] >= 400) {
+      throw new PaymentGatewayException($response->errorDescription, $response->errorCode);
+    }
+    
+    return $response;
   }
 }

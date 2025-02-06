@@ -16,12 +16,12 @@ class Order
   const TYPE_RECURRING = 'Order_REC';
 
   /**
-   * @throws Exception
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function __construct($options)
   {
     if (empty($options) || !is_array($options)) {
-      throw new Exception('Invalid options');
+      throw new PaymentGatewayException('Invalid options');
     }
 
     foreach ($options as $key => $value) {
