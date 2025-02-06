@@ -1,4 +1,9 @@
-# Kapital Bank Payment Gateway integration library
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c51c3a01-8a26-4f47-9046-83404509eb95" height="100px">
+</p>
+
+# Kapital Bank E-Commerce API integration library
+Seamlessly integrate Kapital Bank E-Commerce API using object-oriented PHP.
 
 ## Table of Contents
 
@@ -79,6 +84,13 @@ $orderStatus = $paymentGateway->getOrderStatus([
   'id' => <ORDER_ID>,
   'password' => '<ORDER_PASSWORD>' 
 ]);
+
+// or use
+$orderStatus = $paymentGateway->getDetailedOrderStatus([
+  'id' => <ORDER_ID>,
+  'password' => '<ORDER_PASSWORD>' 
+]); // for detailed order status
+
 $status = $orderStatus->status;
 
 // Do any stuff depending on status
@@ -103,6 +115,7 @@ if ($orderStatus->isOneOf([OrderStatus::CANCELED, OrderStatus::DECLINED])) {
 ```
 
 ### 2.5 Restore order
+<em>You can only restore payments with `Preparing` status so we recommend you to check the order status using `PaymentGateway::getOrderStatus()` method to make sure of it before restoring the order</em>
 ```php
 $orderParams = [
   'id' => <ORDER_ID>,
