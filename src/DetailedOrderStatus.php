@@ -19,4 +19,5 @@ class DetailedOrderStatus extends OrderStatusAbstract
   public $initiationEnvKind;
   public $custAttrs;
   public $reportPubs;
+  public $trans;
 }
