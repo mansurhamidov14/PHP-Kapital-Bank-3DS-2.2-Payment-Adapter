@@ -8,13 +8,13 @@ Seamlessly integrate Kapital Bank E-Commerce API using object-oriented PHP.
 ## Table of Contents
 
 - [1. Installation](#1-installation)
-    - [1.1 Add the lines below to your `composer.json`](#11-add-the-lines-below-to-your-composerjson)
-    - [1.2 Install the package](#12-install-the-package)
 - [2. Usage](#2-usage)
     - [2.1 Initialize payment gateway adapter](#21-initialize-payment-gateway-adapter)
     - [2.2 Create order](#22-create-order)
     - [2.3 Refunding](#23-refunding)
     - [2.4 Get order status](#24-get-order-status)
+    - [2.5 Restore order](#25-restore-order)
+    - [2.6 Sending custom requests](#26-sending-custom-requests)
 
 ## 1. Installation
 ```composer require twelver313/kapital-bank```
@@ -129,3 +129,26 @@ if ($orderStatus->isPreparing()) {
   $order->navigateToPaymentPage();
 }
 ```
+
+### 2.6 Sending custom requests
+<em>Since this library doesn't provide all E-Commerce API features 
+you can still perform the operations that are not coming out of the box by sending custom HTTP-requests</em>
+```php
+$response = $paymentGateway->makeRequest('POST', '/api/order/{id}/set-src-token?password={password}', [
+  'order' => [
+    'initiationEnvKind' => 'Server'
+  ],
+  'token' => [
+    'extCof'  => [
+      'ridByCofp' => '<RID_OF_CARD>',
+      'cofProviderRid' => 'TWO_COF'
+    ],
+    'card' => [
+      'entryMode' => 'ECommerce'
+    ]
+  ]
+]);
+
+print_r($response);
+```
+<em>Response will be an instance of `stdClass`. See official BirBank E-commerce API documentation to find out the response structure depending on your request</em>

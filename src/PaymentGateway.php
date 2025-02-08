@@ -66,13 +66,7 @@ class PaymentGateway
       $body['order']['hppRedirectUrl'] = $options['redirectUrl'];
     }
 
-    $requestOptions = [
-      CURLOPT_POST => true,
-      CURLOPT_URL => $this->paymentHost . '/api/order/',
-      CURLOPT_POSTFIELDS => json_encode($body)
-    ];
-
-    $order = (array)(self::executeRequest($requestOptions)->order);
+    $order = (array)($this->makeRequest('POST', '/api/order', $body)->order);
     return new Order($order);
   }
 
@@ -147,17 +141,13 @@ class PaymentGateway
       throw new PaymentGatewayException('Missing required parameter "password" for "getOrderStatus" method');
     }
 
-    $requestUrl = $this->paymentHost . '/api/order/' . $options['id'] . '?password=' . $options['password'];
+    $requestUrl = '/api/order/' . $options['id'] . '?password=' . $options['password'];
 
     if ($is_detailed) {
       $requestUrl .= '&tranDetailLevel=2&tokenDetailLevel=2&orderDetailLevel=2';
     }
 
-    $requestOptions = [
-      CURLOPT_URL => $requestUrl,
-    ];
-
-    return $this->executeRequest($requestOptions)->order;
+    return $this->makeRequest('GET', $requestUrl)->order;
   }
 
   /**
@@ -237,19 +227,19 @@ class PaymentGateway
       throw new PaymentGatewayException('Missing required parameter "amount" for "refund" method');
     }
 
-    $requestOptions = [
-      CURLOPT_URL => $this->paymentHost . '/api/order/' . $options['id'] . '/exec-trans?password=' . $options['password'],
-      CURLOPT_POST => true,
-      CURLOPT_POSTFIELDS => json_encode([
-        'tran' => [
-          'phase' => empty($options['phase']) ? 'Single' : $options['phase'],
-          'type' => 'Refund',
-          'amount' => self::formatPrice($options['amount']),
-        ]
-      ])
+    $requestBody = [
+      'tran' => [
+        'phase' => empty($options['phase']) ? 'Single' : $options['phase'],
+        'type' => 'Refund',
+        'amount' => self::formatPrice($options['amount']),
+      ]
     ];
 
-    $response = $this->executeRequest($requestOptions)->tran;
+    $response = (array)($this->makeRequest(
+      'POST',
+      '/api/order/' . $options['id'] . '/exec-tran?password=' . $options['password'],
+      $requestBody
+    )->tran);
     return new RefundResponse($response);
   }
 
@@ -258,11 +248,26 @@ class PaymentGateway
     return number_format($price, 2, '.', '');
   }
 
-  private function executeRequest($options) {
+  /**
+   * Making an http request to the server
+   * 
+   * @param string $method
+   * @param string $url
+   * @param array|null $body
+   * 
+   * @return \stdClass
+   * @throws \Twelver313\KapitalBank\PaymentGatewayException
+   */
+  public function makeRequest($method, $url, $body = []) {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_HTTPHEADER, $this->requestHeaders);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt_array($curl, $options);
+    curl_setopt($curl, CURLOPT_URL, $this->paymentHost . $url);
+    curl_setopt_array($curl, $this->getCurlOptsByRequestMethod($method));
+    if (!empty($body) && is_array($body)) {
+      curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
+    }
+
     $response = curl_exec($curl);
     $errNo = curl_errno($curl);
     if ($errNo) {
@@ -275,10 +280,36 @@ class PaymentGateway
       curl_close($curl);
     }
 
+    if ($info['http_code'] == 404) {
+      throw new PaymentGatewayException($response->error . ' ' . $response->path, 404);
+    }
+
     if ($info['http_code'] >= 400) {
       throw new PaymentGatewayException($response->errorDescription, $response->errorCode);
     }
     
     return $response;
+  }
+
+  /**
+   * @param string $method
+   * @return array
+   */
+  private function getCurlOptsByRequestMethod($method)
+  {
+    $method = strtoupper($method);
+    switch ($method) {
+      case 'POST':
+        return [CURLOPT_POST => true];
+      case 'PUT':
+      case 'PATCH':
+      case 'DELETE':
+      case 'OPTIONS':
+        return [CURLOPT_CUSTOMREQUEST => $method];
+      case 'HEAD':
+        return [CURLOPT_NOBODY => true];
+      default:
+        return [CURLOPT_POST => false];
+    }
   }
 }
