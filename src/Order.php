@@ -2,8 +2,12 @@
 
 namespace Twelver313\KapitalBank;
 
-use Exception;
-
+/**
+ * @property string $id
+ * @property string $password
+ * @property string|null $secret
+ * @property string $url
+ */
 class Order
 {
   public $password;
@@ -25,7 +29,9 @@ class Order
     }
 
     foreach ($options as $key => $value) {
-      $this->{$key} = $value;
+      if (property_exists($this, $key)) {
+        $this->{$key} = $value;
+      }
     }
 
     $this->url = $options['hppUrl'] . '?' . (http_build_query([

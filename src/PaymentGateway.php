@@ -4,14 +4,21 @@ namespace Twelver313\KapitalBank;
 
 class PaymentGateway
 {
-  private static $PROD_HOST = 'https://e-commerce.kapitalbank.az';
-  private static $DEV_HOST = 'https://txpgtst.kapitalbank.az';
-  private static $DEFAULT_CURRENCY = 'AZN';
-  private static $DEFAULT_LANGUAGE = 'az';
-  private $paymentHost;
-  private $requestHeaders;
+  protected static $PROD_HOST = 'https://e-commerce.kapitalbank.az';
+  protected static $DEV_HOST = 'https://txpgtst.kapitalbank.az';
+  protected static $DEFAULT_CURRENCY = 'AZN';
+  protected static $DEFAULT_LANGUAGE = 'az';
+  protected $paymentHost;
+  protected $requestHeaders;
 
   /**
+   * @param array $options
+   * ```php
+   * $options = [
+   *   'login' => 'Terminal/MerchanLogin',
+   *   'password' => 'MerchantPassword'
+   * ]
+   * ```
    * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function __construct($options)
@@ -44,11 +51,11 @@ class PaymentGateway
    */
   public function createOrder($options, $type)
   {
-    if (empty($options['amount'])) {
+    if (!isset($options['amount'])) {
       throw new PaymentGatewayException('Missing required parameter "amount" for "createPurchaseOrder" method');
     }
 
-    if (empty($options['description'])) {
+    if (!isset($options['description'])) {
       throw new PaymentGatewayException('Missing required parameter "description" for "createPurchaseOrder" method');
     }
 
@@ -73,12 +80,12 @@ class PaymentGateway
   /**
    * @param array $options
    * ```php
-   * [
-   *   'amount' => 100, // Required option
-   *   'description' => 'Payment for a laptop', // Required option
-   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required option
-   *   'currency' => 'AZN', // Optional, default 'AZN'
-   *   'language' => 'az', // Optional, default 'az'
+   * $options = [
+   *   'amount' => 100, // Required option
+   *   'description' => 'Payment for a laptop', // Required option
+   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required option
+   *   'currency' => 'AZN', // Optional, default 'AZN'
+   *   'language' => 'az', // Optional, default 'az'
    * ]
    * ```
    * @throws \Twelver313\KapitalBank\PaymentGatewayException
@@ -92,12 +99,12 @@ class PaymentGateway
   /**
    * @param array $options
    * ```php
-   * [
-   *   'amount' => 100, // Required
-   *   'description' => 'Payment for a laptop', // Required
-   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required
-   *   'currency' => 'AZN', // Optional, default 'AZN'
-   *   'language' => 'az', // Optional, default 'az'
+   * $options = [
+   *   'amount' => 100, // Required
+   *   'description' => 'Payment for a laptop', // Required
+   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required
+   *   'currency' => 'AZN', // Optional, default 'AZN'
+   *   'language' => 'az', // Optional, default 'az'
    * ]
    * ```
    * @throws \Twelver313\KapitalBank\PaymentGatewayException
@@ -111,12 +118,12 @@ class PaymentGateway
   /**
    * @param array $options
    * ```php
-   * [
-   *   'amount' => 100, // Required
-   *   'description' => 'Payment for a laptop', // Required
-   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required
-   *   'currency' => 'AZN', // Optional, default 'AZN'
-   *   'language' => 'az', // Optional, default 'az'
+   * $options = [
+   *   'amount' => 100, // Required
+   *   'description' => 'Payment for a laptop', // Required
+   *   'redirectUrl' => 'https://example.com/payment-redirect', // Required
+   *   'currency' => 'AZN', // Optional, default 'AZN'
+   *   'language' => 'az', // Optional, default 'az'
    * ]
    * ```
    * @throws \Twelver313\KapitalBank\PaymentGatewayException
@@ -153,9 +160,9 @@ class PaymentGateway
   /**
    * @param array $options
    * ```php
-   * [
-   *   'id' => 5555, // Order id
-   *   'password' => 'yourpassword123', // Order password
+   * $options = [
+   *   'id' => 5555, // Order id
+   *   'password' => 'yourpassword123', // Order password
    * ]
    * ```
    * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#3c15f522-6dae-4ee4-a9e2-f43257919b29
@@ -171,9 +178,9 @@ class PaymentGateway
   /**
    * @param array $options
    * ```php
-   * [
-   *   'id' => 5555, // Order id
-   *   'password' => 'zxcvbnn123', // Order password
+   * $options = [
+   *   'id' => 5555, // Order id
+   *   'password' => 'zxcvbnn123', // Order password
    * ]
    * ```
    * @see https://documenter.getpostman.com/view/14817621/2sA3dxCB1b#790f2d23-4ac2-4000-94ec-2b0c45a49709
@@ -187,27 +194,41 @@ class PaymentGateway
   }
 
   /**
-   * @param $options
+   * @param array $options
+   * ```php
+   * $options = [
+   *   'id' => 5555, // Order id
+   *   'password' => 'zxcxvb123', // Order password
+   *   'amount' => 1000, // Refund amount
+   *   'phase' => 'Single', // Optional, default 'Single'
+   * ]
+   * ```
    * @return Order
    * @throws \Twelver313\KapitalBank\PaymentGatewayException
    */
   public function restoreOrder($options) {
-    return new Order([
-      'id' => $options['id'],
-      'password' => $options['password'],
-      'secret' => $options['secret'],
+    if (empty($options['id'])) {
+      throw new PaymentGatewayException('Missing required parameter "id" for "restoreOrder" method');
+    }
+
+    if (empty($options['password'])) {
+      throw new PaymentGatewayException('Missing required parameter "password" for "restoreOrder" method');
+    }
+
+    $options = array_merge($options, [
       'hppUrl' => $this->paymentHost . '/flex'
     ]);
+    return new Order($options);
   }
 
   /**
    * @param array $options
    * ```php
-   * [
-   *   'id' => 5555, // Order id
-   *   'password' => 'zxcxvb123', // Order password
-   *   'amount' => 1000, // Refund amount
-   *   'phase' => 'Single', // Optional, default 'Single'
+   * $options = [
+   *   'id' => 5555, // Order id
+   *   'password' => 'zxcxvb123', // Order password
+   *   'amount' => 1000, // Refund amount
+   *   'phase' => 'Single', // Optional, default 'Single'
    * ]
    * ```
    * @return RefundResponse

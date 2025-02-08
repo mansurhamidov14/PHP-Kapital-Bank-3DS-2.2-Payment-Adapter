@@ -5,14 +5,25 @@ namespace Twelver313\KapitalBank;
 use Exception;
 
 /**
+ * @property int $id id of order
+ * @property string $status Order status
+ * @property string|null $prevStatus Previous status of order
+ * @property string $lastStatusLogin Previous status of order
+ * @property float|int $amount Order amount
+ * @property string $currency Currency of order
+ * @property string $createTime Order creation time. Format: YYYY-MM-DD HH:mm:ss. Timezone: Asia/Baku
+ * @property string|null $finishTime Order finish time. Format: YYYY-MM-DD HH:mm:ss. Timezone: Asia/Baku
+ * @property object $type Object representation of order type
+ * @property mixed $title
  * @method bool isAuthorized() Order has been authorized (Authorization transaction is executed).
  * @method bool isPreparing() Order is being prepared, no transactions have been executed on it yet.
  * @method bool isRejected() Order has been rejected by the PSP (before payment). (Order is rejected by the PSP)
- * @method bool isCanceled() Order has been cancelled by the consumer (before payment). (Order is cancelled by the merchant)
  * @method bool isCancelled() Order has been cancelled by the consumer (before payment). (Order is cancelled by the merchant)
+ * @method bool isCanceled() Alias for `isCancelled()`
  * @method bool isRefused() Consumer has refused to pay for the order (before payment or after unsuccessful payment attempt). (Order is refused by the consumer)
  * @method bool isExpired() Order has expired (before payment). (Timeout occurs when executing the order scenario)
- * @method bool isPartiallyPaid() Order has been partially paid (Clearing transaction is executed for the part of the order amount).
+ * @method bool isPartPaid() Order has been partially paid (Clearing transaction is executed for the part of the order amount).
+ * @method bool isPartiallyPaid() Alias for `isPartPaid()`
  * @method bool isFullyPaid() Order has been fully paid (Clearing transaction is executed for the full order amount (or several clearing transactions)).
  * @method bool isFunded() Order has been funded (debit transaction has been executed). The status can be assigned only to the order of the DualStep Transfer Order class.
  * @method bool isRefunded() Accounted payment amount and the accounted refund amount under the order are equal.
@@ -24,31 +35,15 @@ use Exception;
  */
 class OrderStatusAbstract
 {
-  /** @var int id of order */
   public $id;
-
-  /** @var string Order status */
   public $status;
-
-  /** @var string|null Previous status of order */
   public $prevStatus;
-
   public $lastStatusLogin;
-
-  /** @var double|int Order amount */
   public $amount;
-
-  /** @var string Currency of order */
   public $currency;
-
-  /** @var string Order creation time. Format: YYYY-MM-DD HH:mm:ss. Timezone: Asia/Baku */
   public $createTime;
-
-  /** @var string|null Order finish time. Format: YYYY-MM-DD HH:mm:ss. Timezone: Asia/Baku */
   public $finishTime;
   public $title;
-
-  /** @var object Object representation of order type */
   public $type;
 
   /** @var string Order has been cancelled by the consumer (before payment). (Order is cancelled by the merchant) */
@@ -67,7 +62,7 @@ class OrderStatusAbstract
   const AUTHORIZED = 'Authorized';
 
   /** @var string Order has been partially paid (Clearing transaction is executed for the part of the order amount). */
-  const PARTIALLY_PAID = 'PartiallyPaid';
+  const PARTIALLY_PAID = 'PartPaid';
 
   /** @var string Order has been fully paid (Clearing transaction is executed for the full order amount (or several clearing transactions)). */
   const FULLY_PAID = 'FullyPaid';
@@ -103,7 +98,9 @@ class OrderStatusAbstract
     }
 
     foreach ($options as $key => $value) {
-      $this->{$key} = $value;
+      if (property_exists($this, $key)) {
+        $this->{$key} = $value;
+      }
     }
   }
 
@@ -116,6 +113,10 @@ class OrderStatusAbstract
     $checkStatus = substr($name, 2);
     if ($checkStatus == 'Canceled') {
       $checkStatus = self::CANCELED;
+    }
+
+    if ($checkStatus == 'PartiallyPaid') {
+      $checkStatus = self::PARTIALLY_PAID;
     }
     return $this->status === $checkStatus;
   }
