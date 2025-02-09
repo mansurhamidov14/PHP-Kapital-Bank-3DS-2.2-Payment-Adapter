@@ -25,6 +25,7 @@ class Transaction
   public $currency;
   public $description;
   public $isReversal;
+  public $clearAmount;
   public $type;
   public $result;
 
