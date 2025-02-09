@@ -33,12 +33,12 @@ class Transaction
    */
   public function __construct($options)
   {
-    $this->approvalCode = $options->approvalCode;
+    $this->approvalCode = $options->approvalCode ?? null;
     $this->actionId = $options->actionId;
     $this->billingStatus = $options->billingStatus;
     $this->isReversal = $options->isReversal;
     $this->amount = floatval($options->amount);
-    $this->clearAmount = floatval($options->clearAmount);
+    $this->clearAmount = floatval($options->clearAmount ?? 0);
     $this->currency = $options->currency;
     $this->dateTime = $options->regTime;
     $this->type = $options->type;
