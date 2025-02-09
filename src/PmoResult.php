@@ -2,8 +2,17 @@
 
 namespace Twelver313\KapitalBank;
 
+/**
+ * @property int $code
+ * @property string $title
+ * @property string $description
+ */
 class PmoResult
 {
+  public $code;
+  public $title;
+  public $description;
+
   const NONE = 0;
   const APPROVED = 1;
   const APPROVED_PARTIAL = 2;
@@ -224,18 +233,28 @@ class PmoResult
     self::INVALID_MERCHANT => "Invalid merchant",
   ];
 
+  public function __construct($code, $title, $description)
+  {
+    $this->code = $code;
+    $this->title = $title;
+    $this->description = $description;
+  }
+
   /**
    * @param string|int $code
+   * @return PmoResult|null
    */
-  public static function getByCode($code)
+  public static function fromCode($code)
   {
-    if (isset(self::$title_map[$code])) {
-      return [
-        'title' => self::$title_map[$code],
-        'description' => self::$description_map[$code]
-      ];
+    $code = intval($code);
+    if (!isset(self::$title_map[$code])) {
+      return self::fromCode(0);
     }
 
-    return null;
+    return new PmoResult(
+      intval($code),
+      self::$title_map[$code],
+      self::$description_map[$code]
+    );
   }
 }
